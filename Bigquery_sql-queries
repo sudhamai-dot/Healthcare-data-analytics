@@ -1,0 +1,41 @@
+Remove nulls and invalid metric values
+CREATE OR REPLACE TABLE healthcare_dataset_clean AS
+SELECT *
+FROM healthcare_dataset
+WHERE metric_value IS NOT NULL
+  AND metric_value >= 0;
+
+Calculate average metric per state and metric type
+CREATE OR REPLACE TABLE healthcare_state_metrics AS
+SELECT
+    state_abbr,
+    metric_name,
+    year,
+    AVG(metric_value) AS avg_metric
+FROM healthcare_dataset_clean
+GROUP BY state_abbr, metric_name, year;
+
+Rank states based on average metric
+SELECT
+    state_abbr,
+    metric_name,
+    year,
+    avg_metric,
+    RANK() OVER (PARTITION BY metric_name, year ORDER BY avg_metric DESC) AS ranking
+FROM healthcare_state_metrics;
+
+SELECT
+    state_abbr,
+    MAX(CASE WHEN metric_name = 'Readmission Rate' THEN avg_metric END) AS readmission_rate,
+    MAX(CASE WHEN metric_name = 'Patient Satisfaction' THEN avg_metric END) AS patient_satisfaction,
+    MAX(CASE WHEN metric_name = 'Mortality Rate' THEN avg_metric END) AS mortality_rate
+FROM healthcare_state_rankings
+GROUP BY state_abbr;
+
+SELECT
+    state_abbr,
+    readmission_rate,
+    patient_satisfaction,
+    mortality_rate,
+    RANK() OVER (ORDER BY (readmission_rate + patient_satisfaction + mortality_rate) DESC) AS overall_ranking
+FROM healthcare_state_pivot;

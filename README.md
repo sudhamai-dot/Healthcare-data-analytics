@@ -29,4 +29,5 @@ Outcome
 
 ## Links
 - SQL Queries: `sql/healthcare_metrics_aggregation.sql`  
-- Tableau Dashboard: [Insert Tableau Public URL]
+- Tableau Dashboard: https://public.tableau.com/views/PORTFOLIO_AVGSCORES/Sheet1?:language=en-US&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link
+- 
